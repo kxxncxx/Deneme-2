@@ -19,10 +19,17 @@ jobs:
         with:
           gradle-version: 8.7
 
-      - name: Proje klasörünü bul
+      - name: Zip varsa ac
+        run: |
+          for z in $(find . -maxdepth 2 -name '*.zip' -not -path './.git/*'); do
+            unzip -o -q "$z" -d "$(dirname "$z")/_acilan"
+          done
+
+      - name: Proje klasorunu bul
         id: find
         run: |
-          f=$(find . -name settings.gradle.kts -not -path '*/node_modules/*' | head -1)
+          f=$(find . -name settings.gradle.kts | head -1)
+          if [ -z "$f" ]; then echo "settings.gradle.kts bulunamadi"; find . -not -path './.git/*' | head -50; exit 1; fi
           echo "dir=$(dirname "$f")" >> "$GITHUB_OUTPUT"
 
       - name: Debug APK derle
